@@ -1,70 +1,70 @@
 # install-docker.sh
 
-One-liner shell script to install **Docker Engine + Compose v2** on **Debian / Ubuntu**.
+一个用于在 **Debian / Ubuntu** 上安装 **Docker Engine + Compose v2** 的一键 Shell 脚本。
 
-Follows the official [Docker apt repository installation](https://docs.docker.com/engine/install/debian/) procedure — automates GPG key import, source configuration, dependency installation, and daemon startup.
+脚本遵循官方的 [Docker apt 仓库安装流程](https://docs.docker.com/engine/install/debian/)，自动完成 GPG 密钥导入、软件源配置、依赖安装以及 Docker 服务启动。
 
-## Quick Start
+## 快速开始
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/Unarmored7/install-docker/main/install-docker.sh | sudo bash
 ```
 
-Or with `wget`:
+或者使用 `wget`：
 
 ```bash
 wget -qO- https://raw.githubusercontent.com/Unarmored7/install-docker/main/install-docker.sh | sudo bash
 ```
 
-## Requirements
+## 运行要求
 
-| Item         | Requirement                   |
-|--------------|-------------------------------|
-| Distribution | Debian 11+ / Ubuntu 20.04+   |
-| Privilege    | root (or `sudo`)              |
-| Network      | Access to `download.docker.com` |
+| 项目 | 要求 |
+|------|------|
+| 发行版 | Debian 11+ / Ubuntu 20.04+ |
+| 权限 | root 或 `sudo` |
+| 网络 | 能访问 `download.docker.com` |
 
-## What It Does
+## 脚本会做什么
 
-| Step | Action |
-|------|--------|
-| 1 | Remove conflicting legacy packages (`docker.io`, `podman-docker`, etc.) |
-| 2 | Purge stale Docker apt sources and GPG keys |
-| 3 | Update the apt package index |
-| 4 | Install prerequisites (`ca-certificates`, `curl`) |
-| 5 | Import Docker's official GPG key into `/etc/apt/keyrings/` |
-| 6 | Add the Docker apt repository (Deb822 `.sources` format) |
-| 7 | Install `docker-ce`, `docker-ce-cli`, `containerd.io`, `docker-buildx-plugin`, `docker-compose-plugin` |
+| 步骤 | 操作 |
+|------|------|
+| 1 | 移除可能冲突的旧版软件包，如 `docker.io`、`podman-docker` 等 |
+| 2 | 清理遗留的 Docker apt 软件源和 GPG 密钥 |
+| 3 | 更新 apt 软件包索引 |
+| 4 | 安装前置依赖 `ca-certificates` 和 `curl` |
+| 5 | 将 Docker 官方 GPG 密钥导入 `/etc/apt/keyrings/` |
+| 6 | 添加 Docker apt 软件源（Deb822 `.sources` 格式） |
+| 7 | 安装 `docker-ce`、`docker-ce-cli`、`containerd.io`、`docker-buildx-plugin`、`docker-compose-plugin` |
 
-After installation the script enables and starts the Docker daemon via systemd.
+安装完成后，脚本会通过 systemd 启用并启动 Docker 守护进程。
 
-## Environment Variables
+## 环境变量
 
-| Variable  | Default | Description |
-|-----------|---------|-------------|
-| `DRY_RUN` | `0`     | Set to `1` to print commands without executing them |
+| 变量 | 默认值 | 说明 |
+|------|--------|------|
+| `DRY_RUN` | `0` | 设为 `1` 时只打印命令，不真正执行 |
 
 ```bash
 sudo DRY_RUN=1 bash install-docker.sh
 ```
 
-## Post-Install
+## 安装后操作
 
-Allow a non-root user to run Docker without `sudo`:
+如果你希望普通用户无需 `sudo` 即可运行 Docker：
 
 ```bash
 sudo usermod -aG docker $USER
-# then log out and back in, or run:
+# 然后退出并重新登录，或者执行：
 newgrp docker
 ```
 
-Verify the installation:
+验证安装是否成功：
 
 ```bash
 docker run hello-world
 ```
 
-## Uninstall
+## 卸载
 
 ```bash
 sudo apt-get purge -y docker-ce docker-ce-cli containerd.io \
@@ -73,6 +73,6 @@ sudo rm -rf /var/lib/docker /var/lib/containerd
 sudo rm -f /etc/apt/sources.list.d/docker.sources /etc/apt/keyrings/docker.asc
 ```
 
-## License
+## 许可证
 
 [MIT](LICENSE)

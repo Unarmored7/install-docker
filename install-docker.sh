@@ -10,7 +10,7 @@
 #   https://docs.docker.com/engine/install/ubuntu/
 #
 # 用法：
-#   wget -qO- <raw-url> | bash
+#   curl -fsSL <raw-url> | bash
 #   # 或先下载到本地后执行（非 root 时自动 sudo 提权）：
 #   bash install-docker.sh
 #
@@ -93,8 +93,15 @@ if [[ "${EUID}" -ne 0 ]]; then
     else
       die "通过管道执行时请使用：curl ... | sudo bash"
     fi
+  elif command -v su &>/dev/null; then
+    if [[ "$0" != "bash" && "$0" != "-bash" && "$0" != "sh" && "$0" != "-sh" && -f "$0" ]]; then
+      warn "当前非 root 用户，正在通过 su 重新执行 ..."
+      exec su -c "bash '$0'"
+    else
+      die "通过管道执行时请使用：curl ... | sudo bash"
+    fi
   else
-    die "请以 root 身份运行此脚本。"
+    die "请以 root 身份运行此脚本，或确保系统中可用 sudo / su。"
   fi
 fi
 
@@ -156,6 +163,8 @@ if [[ -n "${PRE_DOCKER}" ]]; then
     echo
   fi
 fi
+
+info "将安装 stable 通道中的最新版本。"
 
 # ---------------------------------------------------------------------------
 # 网络连通性检查
@@ -224,7 +233,7 @@ if [[ "${UPGRADE_MODE}" -eq 0 ]]; then
   # -- 第 4 步：安装前置依赖 ------------------------------------------------
   STEP=$((STEP + 1))
   info "[${STEP}/${STEPS}] 正在安装前置依赖（ca-certificates、curl）..."
-  run apt-get install -y -qq ca-certificates curl
+  run env DEBIAN_FRONTEND=noninteractive apt-get install -y -qq ca-certificates curl
 
   # -- 第 5 步：导入 Docker 官方 GPG 密钥 -----------------------------------
   STEP=$((STEP + 1))
@@ -259,7 +268,7 @@ run apt-get update -qq
 
 STEP=$((STEP + 1))
 info "[${STEP}/${STEPS}] 正在安装或升级 Docker Engine、CLI 和插件..."
-run apt-get install -y -qq \
+run env DEBIAN_FRONTEND=noninteractive apt-get install -y -qq \
   docker-ce \
   docker-ce-cli \
   containerd.io \

@@ -96,7 +96,7 @@ if [[ "${EUID}" -ne 0 ]]; then
   elif command -v su &>/dev/null; then
     if [[ "$0" != "bash" && "$0" != "-bash" && "$0" != "sh" && "$0" != "-sh" && -f "$0" ]]; then
       warn "当前非 root 用户，正在通过 su 重新执行 ..."
-      exec su -c "bash '$0'"
+      exec su -c "DRY_RUN='${DRY_RUN}' bash '$0'"
     else
       die "通过管道执行时请使用：curl ... | sudo bash"
     fi

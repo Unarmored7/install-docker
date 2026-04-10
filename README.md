@@ -1,8 +1,8 @@
 # install-docker.sh
 
-一个用于在 **Debian / Ubuntu** 上安装 **Docker Engine + Compose v2** 的一键 Shell 脚本。
+一个用于在 **Debian / Ubuntu** 上安装或升级 **Docker Engine + Compose v2** 的一键 Shell 脚本。
 
-脚本遵循官方的 [Docker apt 仓库安装流程](https://docs.docker.com/engine/install/debian/)，自动完成 GPG 密钥导入、软件源配置、依赖安装以及 Docker 服务启动。
+脚本遵循官方的 [Docker apt 仓库安装流程](https://docs.docker.com/engine/install/debian/)，自动完成 GPG 密钥导入、软件源配置、依赖安装以及 Docker 服务启动。若系统已经通过 Docker 官方 apt 仓库安装过 Docker，重复运行本脚本即可继续升级 Docker 和 Docker Compose。
 
 ## 快速开始
 
@@ -28,7 +28,7 @@ wget -qO- https://raw.githubusercontent.com/Unarmored7/install-docker/main/insta
 
 | 步骤 | 操作 |
 |------|------|
-| 1 | 移除可能冲突的旧版软件包，如 `docker.io`、`podman-docker` 等 |
+| 1 | 移除其他安装渠道带来的冲突软件包，如 `docker.io`、`podman-docker` 等 |
 | 2 | 清理遗留的 Docker apt 软件源和 GPG 密钥 |
 | 3 | 更新 apt 软件包索引 |
 | 4 | 安装前置依赖 `ca-certificates` 和 `curl` |
@@ -37,6 +37,16 @@ wget -qO- https://raw.githubusercontent.com/Unarmored7/install-docker/main/insta
 | 7 | 安装 `docker-ce`、`docker-ce-cli`、`containerd.io`、`docker-buildx-plugin`、`docker-compose-plugin` |
 
 安装完成后，脚本会通过 systemd 启用并启动 Docker 守护进程。
+
+## 升级说明
+
+如果你的 Docker 原本就是通过本脚本或 Docker 官方 apt 仓库安装的，直接重新运行本脚本即可升级：
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/Unarmored7/install-docker/main/install-docker.sh | sudo bash
+```
+
+第 1 步只会移除其他渠道安装的冲突包，不会卸载官方 `docker-ce`、`docker-ce-cli`、`docker-compose-plugin` 等包。
 
 ## 环境变量
 

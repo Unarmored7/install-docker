@@ -3,7 +3,9 @@
 # install-docker.sh
 # =================
 # 通过 Docker 官方 apt 软件源，在 Debian / Ubuntu 上安装
-# Docker Engine 和 Compose v2。安装流程参考以下官方文档：
+# Docker Engine 和 Compose v2。重复运行本脚本时，会保留官方
+# docker-ce 系列包，并将其升级到仓库中的最新版本。
+# 安装流程参考以下官方文档：
 #   https://docs.docker.com/engine/install/debian/
 #   https://docs.docker.com/engine/install/ubuntu/
 #
@@ -17,7 +19,7 @@
 #   DRY_RUN=1   仅打印将要执行的命令，不真正执行。
 #
 # 本脚本执行的内容（共 7 步）：
-#   1. 移除可能冲突的旧版软件包（docker.io、podman-docker 等）
+#   1. 移除其他安装渠道带来的冲突软件包（docker.io、podman-docker 等）
 #   2. 清理遗留的 Docker apt 软件源和 GPG 密钥
 #   3. 更新 apt 软件包索引
 #   4. 安装前置依赖（ca-certificates、curl）
@@ -98,7 +100,7 @@ fi
 # ---------------------------------------------------------------------------
 if command -v docker &>/dev/null; then
   warn "Docker is already installed: $(docker --version 2>/dev/null || echo 'unknown')"
-  warn "Continuing will clean old sources and reinstall the latest version."
+  warn "Continuing will preserve official docker-ce packages and upgrade them to the latest available version."
   if [[ -t 0 ]]; then
     read -r -t 10 -p "Press Enter to continue, or Ctrl+C to abort... " || true
     echo
@@ -122,12 +124,14 @@ ok "Network OK."
 # ===========================================================================
 STEPS=7
 
-# -- 第 1 步：移除冲突的软件包 ----------------------------------------------
-info "[1/${STEPS}] Removing conflicting legacy packages ..."
+# -- 第 1 步：移除其他来源的冲突软件包 --------------------------------------
+info "[1/${STEPS}] Removing conflicting packages from other installation sources ..."
 
 # 这些是 Docker 官方文档列出的潜在冲突软件包。
-LEGACY_PKGS="docker.io docker-compose docker-doc podman-docker containerd runc"
-FOUND=$(dpkg --get-selections ${LEGACY_PKGS} 2>/dev/null | awk '{print $1}' || true)
+# 不包含 docker-ce、docker-ce-cli、docker-compose-plugin 等官方仓库软件包，
+# 因此可重复运行本脚本用于升级。
+CONFLICT_PKGS="docker.io docker-compose docker-doc podman-docker containerd runc"
+FOUND=$(dpkg --get-selections ${CONFLICT_PKGS} 2>/dev/null | awk '{print $1}' || true)
 
 if [[ -n "${FOUND}" ]]; then
   info "Removing: ${FOUND}"

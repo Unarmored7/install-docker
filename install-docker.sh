@@ -10,11 +10,10 @@
 #   https://docs.docker.com/engine/install/ubuntu/
 #
 # 用法：
-#   curl -fsSL <raw-url> | bash          # 以 root 身份运行
-#   curl -fsSL <raw-url> | sudo bash     # 以普通用户运行
-#   # 或先下载到本地后执行：
-#   bash install-docker.sh               # 以 root 身份运行
-#   sudo bash install-docker.sh          # 以普通用户运行
+#   wget -qO- <raw-url> | bash           # 以 root 身份运行
+#   wget -qO- <raw-url> | sudo bash      # 以普通用户运行
+#   # 或先下载到本地后执行（非 root 时自动 sudo 提权）：
+#   bash install-docker.sh
 #
 # 环境变量：
 #   DRY_RUN=1   仅打印将要执行的命令，不真正执行。

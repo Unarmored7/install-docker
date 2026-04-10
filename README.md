@@ -13,15 +13,25 @@
 
 ## 快速开始
 
+以 root 身份直接运行：
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/Unarmored7/install-docker/main/install-docker.sh | bash
+```
+
+以普通用户通过 `sudo` 运行：
+
 ```bash
 curl -fsSL https://raw.githubusercontent.com/Unarmored7/install-docker/main/install-docker.sh | sudo bash
 ```
 
-或者使用 `wget`：
+如果你已经先把脚本下载到本地，那么普通用户也可以直接执行：
 
 ```bash
-wget -qO- https://raw.githubusercontent.com/Unarmored7/install-docker/main/install-docker.sh | sudo bash
+bash install-docker.sh
 ```
+
+脚本会检测当前不是 root 用户，并自动通过 `sudo` 重新执行。
 
 ## 运行要求
 
@@ -48,6 +58,12 @@ wget -qO- https://raw.githubusercontent.com/Unarmored7/install-docker/main/insta
 ## 升级说明
 
 如果你的 Docker 原本就是通过本脚本或 Docker 官方 apt 仓库安装的，直接重新运行本脚本即可升级：
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/Unarmored7/install-docker/main/install-docker.sh | bash
+```
+
+如果是普通用户通过管道执行，请改用：
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/Unarmored7/install-docker/main/install-docker.sh | sudo bash

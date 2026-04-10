@@ -10,10 +10,11 @@
 #   https://docs.docker.com/engine/install/ubuntu/
 #
 # 用法：
-#   curl -fsSL <raw-url> | sudo bash
-#   wget -qO- <raw-url> | sudo bash
+#   curl -fsSL <raw-url> | bash          # 以 root 身份运行
+#   curl -fsSL <raw-url> | sudo bash     # 以普通用户运行
 #   # 或先下载到本地后执行：
-#   sudo bash install-docker.sh
+#   bash install-docker.sh               # 以 root 身份运行
+#   sudo bash install-docker.sh          # 以普通用户运行
 #
 # 环境变量：
 #   DRY_RUN=1   仅打印将要执行的命令，不真正执行。
@@ -85,8 +86,19 @@ if [[ "${ID:-}" != "debian" && "${ID:-}" != "ubuntu" ]]; then
   die "不支持当前发行版（ID=${ID:-unknown}），本脚本仅支持 Debian 和 Ubuntu。"
 fi
 
-# 2. 必须以 root 身份运行。
-[[ "${EUID}" -eq 0 ]] || die "请以 root 身份运行此脚本，例如：sudo bash $0"
+# 2. 必须以 root 身份运行；若非 root 则尝试自动通过 sudo 提权。
+if [[ "${EUID}" -ne 0 ]]; then
+  if command -v sudo &>/dev/null; then
+    if [[ "$0" != "bash" && "$0" != "-bash" && "$0" != "sh" && "$0" != "-sh" && -f "$0" ]]; then
+      warn "当前非 root 用户，正在通过 sudo 重新执行 ..."
+      exec sudo -E bash "$0" "$@"
+    else
+      die "通过管道执行时请使用：curl ... | sudo bash"
+    fi
+  else
+    die "请以 root 身份运行此脚本。"
+  fi
+fi
 
 # 3. 检测 CPU 架构（用于生成 apt 软件源条目）。
 ARCH=$(dpkg --print-architecture 2>/dev/null || true)

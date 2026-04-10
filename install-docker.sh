@@ -10,8 +10,8 @@
 #   https://docs.docker.com/engine/install/ubuntu/
 #
 # 用法：
-#   wget -qO- <raw-url> | bash           # 以 root 身份运行
-#   wget -qO- <raw-url> | sudo bash      # 以普通用户运行
+#   command -v curl >/dev/null || apt-get install -y -qq curl
+#   curl -fsSL <raw-url> | bash
 #   # 或先下载到本地后执行（非 root 时自动 sudo 提权）：
 #   bash install-docker.sh
 #

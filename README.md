@@ -18,26 +18,26 @@
 ## 快速开始
 
 ```bash
-wget -qO- https://raw.githubusercontent.com/Unarmored7/install-docker/main/install-docker.sh | bash
+command -v curl >/dev/null || apt-get install -y -qq curl
+curl -fsSL https://raw.githubusercontent.com/Unarmored7/install-docker/main/install-docker.sh | bash
 ```
 
 <details>
 <summary>其他运行方式</summary>
 
-使用 `curl`：
+使用 `wget`（Debian / Ubuntu 预装）：
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/Unarmored7/install-docker/main/install-docker.sh | bash
+wget -qO- https://raw.githubusercontent.com/Unarmored7/install-docker/main/install-docker.sh | bash
 ```
 
 下载到本地后执行（非 root 时自动 sudo 提权）：
 
 ```bash
-wget -qO- https://raw.githubusercontent.com/Unarmored7/install-docker/main/install-docker.sh -O install-docker.sh
 bash install-docker.sh
 ```
 
-> **Note:** `wget` 在 Debian / Ubuntu 上预装，推荐优先使用。非 root 用户通过管道执行时，请将 `bash` 替换为 `sudo bash`。
+> **Note:** 非 root 用户通过管道执行时，请将 `bash` 替换为 `sudo bash`。
 
 </details>
 
@@ -76,7 +76,8 @@ bash install-docker.sh
 直接重新运行即可：
 
 ```bash
-wget -qO- https://raw.githubusercontent.com/Unarmored7/install-docker/main/install-docker.sh | bash
+command -v curl >/dev/null || apt-get install -y -qq curl
+curl -fsSL https://raw.githubusercontent.com/Unarmored7/install-docker/main/install-docker.sh | bash
 ```
 
 脚本检测到 `/etc/apt/sources.list.d/docker.sources` 和 `/etc/apt/keyrings/docker.asc` 已就绪后，自动跳过步骤 1–6，仅执行 `apt-get update` + `apt-get install` 升级到最新版本。

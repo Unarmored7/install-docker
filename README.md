@@ -4,6 +4,13 @@
 
 脚本遵循官方的 [Docker apt 仓库安装流程](https://docs.docker.com/engine/install/debian/)，自动完成 GPG 密钥导入、软件源配置、依赖安装以及 Docker 服务启动。若系统已经通过 Docker 官方 apt 仓库安装过 Docker，重复运行本脚本即可继续升级 Docker 和 Docker Compose。
 
+脚本会自动区分两种场景：
+
+| 场景 | 行为 |
+|------|------|
+| 首次安装 | 执行完整的 7 个步骤：清理冲突包、配置官方源、安装 Docker |
+| 升级已有官方安装 | 检测到 `/etc/apt/sources.list.d/docker.sources` 和 `/etc/apt/keyrings/docker.asc` 后，跳过步骤 1-6，仅执行 `apt-get update` 和 `apt-get install` |
+
 ## 快速开始
 
 ```bash
@@ -24,7 +31,7 @@ wget -qO- https://raw.githubusercontent.com/Unarmored7/install-docker/main/insta
 | 权限 | root 或 `sudo` |
 | 网络 | 能访问 `download.docker.com` |
 
-## 脚本会做什么
+## 首次安装会做什么
 
 | 步骤 | 操作 |
 |------|------|
@@ -36,7 +43,7 @@ wget -qO- https://raw.githubusercontent.com/Unarmored7/install-docker/main/insta
 | 6 | 添加 Docker apt 软件源（Deb822 `.sources` 格式） |
 | 7 | 安装 `docker-ce`、`docker-ce-cli`、`containerd.io`、`docker-buildx-plugin`、`docker-compose-plugin` |
 
-安装完成后，脚本会通过 systemd 启用并启动 Docker 守护进程。
+安装完成后，脚本会通过 systemd 启用并启动 Docker 守护进程，并输出 Docker Engine、Compose、Buildx 的版本结果。
 
 ## 升级说明
 
@@ -46,7 +53,9 @@ wget -qO- https://raw.githubusercontent.com/Unarmored7/install-docker/main/insta
 curl -fsSL https://raw.githubusercontent.com/Unarmored7/install-docker/main/install-docker.sh | sudo bash
 ```
 
-第 1 步只会移除其他渠道安装的冲突包，不会卸载官方 `docker-ce`、`docker-ce-cli`、`docker-compose-plugin` 等包。
+脚本会自动检测系统中是否已存在官方 Docker apt 软件源（`/etc/apt/sources.list.d/docker.sources`）和 GPG 密钥（`/etc/apt/keyrings/docker.asc`）。如果检测到，将自动跳过步骤 1-6，仅执行 `apt-get update` 和 `apt-get install` 来升级已安装的 Docker 包。
+
+升级完成后，脚本会显示安装前后的版本对比，便于确认是全新安装、版本未变还是已经升级。
 
 ## 环境变量
 

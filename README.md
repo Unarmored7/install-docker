@@ -20,16 +20,22 @@
 ## 快速开始
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/Unarmored7/install-docker/main/install-docker.sh | bash
+if command -v curl >/dev/null 2>&1; then
+  curl -fsSL https://raw.githubusercontent.com/Unarmored7/install-docker/main/install-docker.sh | bash
+elif command -v wget >/dev/null 2>&1; then
+  wget -qO- https://raw.githubusercontent.com/Unarmored7/install-docker/main/install-docker.sh | bash
+else
+  apt-get update -qq && apt-get install -y -qq ca-certificates curl
+  curl -fsSL https://raw.githubusercontent.com/Unarmored7/install-docker/main/install-docker.sh | bash
+fi
 ```
 
 <details>
 <summary>其他运行方式</summary>
 
-使用 `curl`（未安装时会自动安装）：
+使用 `curl`：
 
 ```bash
-command -v curl >/dev/null || apt-get install -y -qq curl
 curl -fsSL https://raw.githubusercontent.com/Unarmored7/install-docker/main/install-docker.sh | bash
 ```
 

@@ -71,6 +71,53 @@ run() {
   fi
 }
 
+ensure_download_tool() {
+  local context="$1"
+
+  if command -v curl &>/dev/null || command -v wget &>/dev/null; then
+    return 0
+  fi
+
+  info "[${context}] 未找到 curl/wget，正在安装 curl..."
+  run apt-get update -qq
+  run env DEBIAN_FRONTEND=noninteractive apt-get install -y -qq ca-certificates curl
+
+  if [[ "${DRY_RUN}" == "1" ]]; then
+    return 0
+  fi
+
+  command -v curl &>/dev/null || command -v wget &>/dev/null \
+    || die "[${context}] 无法找到 curl/wget，也未能自动安装 curl。"
+}
+
+download_to_file() {
+  local url="$1" output="$2"
+
+  if command -v curl &>/dev/null; then
+    run curl -fsSL "${url}" -o "${output}"
+  elif command -v wget &>/dev/null; then
+    run wget -qO "${output}" "${url}"
+  elif [[ "${DRY_RUN}" == "1" ]]; then
+    echo "${YELLOW}[DRY_RUN]${RESET} download ${url} to ${output}"
+  else
+    return 127
+  fi
+}
+
+check_url() {
+  local url="$1"
+
+  if command -v curl &>/dev/null; then
+    curl -fsSL --connect-timeout 10 --max-time 15 "${url}" -o /dev/null 2>/dev/null
+  elif command -v wget &>/dev/null; then
+    wget -qO /dev/null -T 15 -t 1 "${url}" 2>/dev/null
+  elif [[ "${DRY_RUN}" == "1" ]]; then
+    echo "${YELLOW}[DRY_RUN]${RESET} check ${url}"
+  else
+    return 127
+  fi
+}
+
 # ---------------------------------------------------------------------------
 # 预检查
 # ---------------------------------------------------------------------------
@@ -169,9 +216,9 @@ info "将安装 stable 通道中的最新版本。"
 # ---------------------------------------------------------------------------
 # 网络连通性检查
 # ---------------------------------------------------------------------------
+ensure_download_tool "预检查"
 info "正在检查到 ${DOCKER_URL} 的网络连通性..."
-if ! curl -fsSL --connect-timeout 10 --max-time 15 "${DOCKER_URL}" \
-     -o /dev/null 2>/dev/null; then
+if ! check_url "${DOCKER_URL}"; then
   die "无法访问 ${DOCKER_URL}，请检查网络连接后重试。"
 fi
 ok "网络连通性正常。"
@@ -239,7 +286,7 @@ if [[ "${UPGRADE_MODE}" -eq 0 ]]; then
   STEP=$((STEP + 1))
   info "[${STEP}/${STEPS}] 正在导入 Docker GPG 密钥..."
   run install -m 0755 -d /etc/apt/keyrings
-  run curl -fsSL "${DOCKER_URL}/linux/${ID}/gpg" -o /etc/apt/keyrings/docker.asc
+  download_to_file "${DOCKER_URL}/linux/${ID}/gpg" /etc/apt/keyrings/docker.asc
   run chmod a+r /etc/apt/keyrings/docker.asc
   ok "GPG 密钥已导入：/etc/apt/keyrings/docker.asc"
 
